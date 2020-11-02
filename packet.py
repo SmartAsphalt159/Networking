@@ -2,6 +2,8 @@
 
 #class for packet structure
 
+import socket
+
 class packet:
 
     #constructor
@@ -10,25 +12,39 @@ class packet:
         self.steering = steering
         self.speed = speed
 
-    #getters
-    def getidentifier(self, identifier):
-        return self.identifier
+    #Input bytes
+    #Error status
+    def decode_pkt(self, bts): 
+       dstr = bts.decode() #decoded string
+       breakdown_str(self, dstr) #splits string and assigns obj
 
-    def getsteering(self, steering):
-        return self.steering
+    #input: formatted string
+    #output: formatted bytes
+    def encode_pkt(estr):
+        ret = str.encode(estr)
+        return ret
 
-    def getspeed(self, speed):
-        return self.speed
+    #input: current obj
+    #output: formatted bytes
+    def build_str(self):
+        delim = '-'
+        ret = str(self.identifier) + delim + str(self.steering) \
+            + delim + str(self.speed)
+        return ret
+    
+    #input: formatted string
+    #ouput: int for error status, packet obj is updated
+    def breakdown_str(self, fstr):
+        lst = fstr.split("-")
+        if(len(lst) != 3): #if three items weren't sent, something went wrong 
+            return -1
 
-    #setters
-    def setidentifier(self, identifier):
-        self.identifier = identifier
+        #set internal variables
+        self.identifier = float(lst[0])
+        self.steering = float(lst[1])
+        self.speed = float(lst[2])
 
-    def setsteering(self, steering):
-        self.steering = steering
-
-    def setspeed(self, speed):
-        self.speed = speed
-
+        #return okay
+        return 0
 
 
