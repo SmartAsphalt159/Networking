@@ -39,8 +39,8 @@ def listening(rskt):
     print(rskt.getsockname())
     while(1):
         data, address = rskt.recvfrom(200)
-        rpkt = data.decode_pkt()
-        print("{}, {}, {}, {}", address, rpkt.identifier, rpkt.steering, rpkt.speed)
+        rpkt.decode_pkt(data)
+        print(f"{address}, {rpkt.identifier}, {rpkt.steering}, {rpkt.speed}\n")
 
 if __name__ == "__main__":
     main()
