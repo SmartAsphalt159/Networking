@@ -30,14 +30,17 @@ def main():
 
 def bcast(sskt):
     while(1): #replace with flag for getting new sample later on
-        sskt.send(("Car 1 packet is broadcasting").encode())     #replace with packet encoding
+        spkt = Packet(1, 0, 1) #test packet 
+        sskt.send((spkt.build_str()).encode())     #replace with packet encoding
         time.sleep(2)
 
 def listening(rskt):
+    rpkt = Packet(0, 0, 0) #initializing packet
     print(rskt.getsockname())
     while(1):
         data, address = rskt.recvfrom(200)
-        print(address, data)
+        rpkt = data.decode_pkt()
+        print("{}, {}, {}, {}", address, rpkt.identifier, rpkt.steering, rpkt.speed)
 
 if __name__ == "__main__":
     main()
