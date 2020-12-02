@@ -7,8 +7,8 @@ import socket
 class Packet:
 
     #constructor
-    def __init__(self, identifier, steering, speed):
-        self.identifier = identifier
+    def __init__(self, braking, steering, speed):
+        self.braking = braking
         self.steering = steering
         self.speed = speed
 
@@ -29,7 +29,7 @@ class Packet:
     #output: formatted bytes
     def build_str(self):
         delim = '-'
-        ret = str(self.identifier) + delim + str(self.steering) \
+        ret = str(self.braking) + delim + str(self.steering) \
             + delim + str(self.speed)
         return ret
     
@@ -41,7 +41,7 @@ class Packet:
             return -1 #returns packet indicating error
 
         #set internal variables
-        self.identifier = int(lst[0])
+        self.braking = float(lst[0])
         self.steering = float(lst[1])
         self.speed = float(lst[2])
 

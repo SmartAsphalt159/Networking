@@ -60,7 +60,7 @@ def listening(rskt):
         printPkt(rpkt, address)
 
 def printPkt(pkt, address):
-    print(f"{address}, {pkt.identifier}, {pkt.steering}, {pkt.speed}\n")
+    print(f"{address}, {pkt.braking}, {pkt.steering}, {pkt.speed}\n")
 
 if __name__ == "__main__":
     main()
