@@ -1,19 +1,17 @@
 #/usr/bin/python3
 
 """
-Example code for exchanging packets through a broadcast address
-Currently being used for communication between multiple debian based SBCs on an adhoc network 
-Last revision: December 2nd, 2020
+Networking implementation for smart asphalt's platoon
+Last revision: December 22nd, 2020
 """
 
 import socket
 import sys
-from Packet import Packet
 import time
 import threading
+from Packet import Packet
 
-def main():
- 
+def net_inet():
     if(len(sys.argv) != 3):                                        #checking argument validity 
         print("Incorrect number of arguments")
         print("Must specify index for sending and receiving port")
@@ -28,7 +26,7 @@ def main():
     ######## BEGIN SOCKET INITIALIZATION ########
     sndskt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)      #using ipv4 address + UDP packets
     recskt = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)      #using ipv4 address + UDP packets
-    sndskt.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)   #broadcasting for now but want to explore multicasting later on
+    sndskt.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)   #configuring for broadcasting 
 
     #Port definitions need to be configured per car
     listen_port = send_port_map[ls]
@@ -36,31 +34,18 @@ def main():
 
     recskt.bind(("100.100.5.255", listen_port))                    #bind socket to broadcast for listening
     sndskt.connect(("100.100.5.255", send_port))                   #connecting on the braodcast port
+
+    return recskt, sndskt
     ######## END SOCKET INITIALIZATION ########
 
-    #spawn thread for listening
-    list_thread = threading.Thread(target=listening, args=([recskt]))
-    list_thread.start()
+def broadcast_data(skt, braking, steering, speed):
+    skt.send((Packet(braking, steering, speed).build_str()).encode())                
 
-    #Broadcast data
-    bcast(sndskt)
-
-def bcast(sskt):
-    while(1):                                                      #replace with flag for getting new sample later on
-        spkt = Packet(1, 0, 1)                                     #test packet 
-        sskt.send((spkt.build_str()).encode())                     #replace with packet encoding
-        time.sleep(2)
-
-def listening(rskt):
-    rpkt = Packet(0, 0, 0)                                         #initializing packet
-    print(rskt.getsockname())
-    while(1):
-        data, address = rskt.recvfrom(200)
-        rpkt.decode_pkt(data)
-        printPkt(rpkt, address)
+def listen_data(rskt):
+    rpkt = Packet(0, 0, 0)                                        #initializing packet
+    data = rskt.recvfrom(40)                                      #TODO decide on appropriate lenght for receiving 
+    rpkt.decode_pkt(data)
+    return rpkt
 
 def printPkt(pkt, address):
     print(f"{address}, {pkt.braking}, {pkt.steering}, {pkt.speed}\n")
-
-if __name__ == "__main__":
-    main()
